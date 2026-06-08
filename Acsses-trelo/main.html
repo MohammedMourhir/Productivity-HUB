@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Manager Pro · UI Notifications</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <!-- ========== CUSTOM UI NOTIFICATION CENTER ========== -->
+        <div id="notificationCenter" class="notification-center"></div>
+        
+        <!-- ========== CUSTOM CONFIRM DIALOG ========== -->
+        <div id="confirmOverlay" class="dialog-overlay">
+            <div class="dialog-box">
+                <div class="dialog-icon" id="confirmIcon"><i class="fas fa-question-circle"></i></div>
+                <div class="dialog-message" id="confirmMessage">Are you sure?</div>
+                <div class="dialog-buttons">
+                    <button class="dialog-btn cancel" id="confirmCancel">Cancel</button>
+                    <button class="dialog-btn confirm" id="confirmOk">OK</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== CUSTOM PROMPT DIALOG ========== -->
+        <div id="promptOverlay" class="dialog-overlay">
+            <div class="dialog-box prompt-box">
+                <div class="dialog-icon"><i class="fas fa-pencil-alt"></i></div>
+                <div class="dialog-message" id="promptTitle">Enter name</div>
+                <input type="text" id="promptInput" class="prompt-input" placeholder="Type here..." autofocus>
+                <div id="promptError" class="prompt-error">Name cannot be empty</div>
+                <div class="dialog-buttons">
+                    <button class="dialog-btn cancel" id="promptCancel">Cancel</button>
+                    <button class="dialog-btn confirm primary" id="promptSubmit">Save</button>
+                </div>
+            </div>
+        </div>
+
+        <header>
+            <div class="header-left">
+                <h1><i class="fas fa-tasks"></i> Task Manager Pro</h1>
+                <button class="btn btn-sm btn-secondary" onclick="TaskManager.showStatistics()" title="View Statistics">
+                    <i class="fas fa-chart-bar"></i> Stats
+                </button>
+            </div>
+            <div class="header-controls">
+                <button class="btn btn-secondary" onclick="TemplateManager.showTemplatesModal()">
+                    <i class="fas fa-clone"></i> Templates
+                </button>
+                <button class="btn btn-secondary" onclick="JSONManager.openModal()">
+                    <i class="fas fa-code"></i> JSON Tools
+                </button>
+                <button class="btn btn-warning" onclick="TaskManager.clearAllDoneTasks()" title="Clear all done tasks from all boards">
+                    <i class="fas fa-broom"></i> Clear All Done
+                </button>
+                <button class="btn btn-danger-dark" onclick="TaskManager.showAdvancedClearOptions()" title="Clear options">
+                    <i class="fas fa-trash-alt"></i> Clear Options
+                </button>
+                <button class="btn btn-primary" onclick="TaskManager.showCreateModal(null)">
+                    <i class="fas fa-plus"></i> Add Task
+                </button>
+            </div>
+        </header>
+
+        <div class="main-layout">
+            <!-- Board List Sidebar -->
+            <div class="board-list">
+                <h2>Your Boards</h2>
+                <div id="boardsContainer">
+                    <!-- Boards will be populated here -->
+                </div>
+                <button class="add-board-btn" onclick="BoardManager.showCreateModal()">
+                    <i class="fas fa-plus"></i> Add New Board
+                </button>
+            </div>
+
+            <!-- Main Content Area -->
+            <div class="main-content">
+                <!-- Status Tabs -->
+                <div class="status-tabs">
+                    <div class="status-tab todo" id="todoTab"
+                         ondrop="DragManager.dropToStatus(event, 'todo')"
+                         ondragover="DragManager.allowDrop(event)">
+                        <h3><i class="fas fa-circle"></i> To Do</h3>
+                        <div id="todoCount" class="task-count">0 tasks</div>
+                        <div id="todoContainer" class="tasks-container">
+                            <!-- Todo tasks will be here -->
+                        </div>
+                        <button class="add-task-btn" onclick="TaskManager.showCreateModal('todo')">
+                            <i class="fas fa-plus"></i> Add Task
+                        </button>
+                    </div>
+                    
+                    <div class="status-tab doing" id="doingTab"
+                         ondrop="DragManager.dropToStatus(event, 'doing')"
+                         ondragover="DragManager.allowDrop(event)">
+                        <h3><i class="fas fa-spinner"></i> Doing</h3>
+                        <div id="doingCount" class="task-count">0 tasks</div>
+                        <div id="doingContainer" class="tasks-container">
+                            <!-- Doing tasks will be here -->
+                        </div>
+                        <button class="add-task-btn" onclick="TaskManager.showCreateModal('doing')">
+                            <i class="fas fa-plus"></i> Add Task
+                        </button>
+                    </div>
+                    
+                    <div class="status-tab done" id="doneTab"
+                         ondrop="DragManager.dropToStatus(event, 'done')"
+                         ondragover="DragManager.allowDrop(event)">
+                        <h3><i class="fas fa-check-circle"></i> Done</h3>
+                        <button class="clear-done-btn" onclick="TaskManager.clearDoneTasks()" title="Clear all completed tasks">
+                            <i class="fas fa-broom"></i> Clear Done
+                        </button>
+                        <div id="doneCount" class="task-count">0 tasks</div>
+                        <div id="doneContainer" class="tasks-container">
+                            <!-- Done tasks will be here -->
+                        </div>
+                        <button class="add-task-btn" onclick="TaskManager.showCreateModal('done')">
+                            <i class="fas fa-plus"></i> Add Task
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Custom Lists Container -->
+                <div class="lists-container" id="listsContainer">
+                    <!-- Custom lists will be populated here -->
+                </div>
+
+                <!-- Add New List Button -->
+                <div style="margin-top: 30px; margin-bottom: 40px;">
+                    <button class="add-board-btn" onclick="ListManager.showCreateModal()">
+                        <i class="fas fa-plus"></i> Add New List
+                    </button>
+                </div>
+
+                <!-- List Templates Section -->
+                <div class="templates-section" id="templatesSection">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h2><i class="fas fa-clone"></i> Saved List Templates</h2>
+                        <button class="btn btn-success btn-sm" onclick="TemplateManager.saveCurrentListAsTemplate()">
+                            <i class="fas fa-save"></i> Save Current List as Template
+                        </button>
+                    </div>
+                    <div class="templates-grid" id="templatesContainer">
+                        <!-- Templates will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== MODALS ========== -->
+    <!-- Board Modal -->
+    <div id="boardModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Create Board</h2>
+                <button class="btn-close" onclick="ModalManager.close()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Board Name</label>
+                    <input type="text" id="boardNameInput" class="form-input" placeholder="e.g., Work Projects" autofocus>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="ModalManager.close()">Cancel</button>
+                <button class="btn btn-primary" onclick="BoardManager.create()">Create</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- List Modal -->
+    <div id="listModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="listModalTitle">Create List</h2>
+                <button class="btn-close" onclick="ModalManager.close()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">List Name</label>
+                    <input type="text" id="listNameInput" class="form-input" placeholder="e.g., Urgent Tasks" autofocus>
+                </div>
+                <div class="form-group">
+                    <label class="form-checkbox">
+                        <input type="checkbox" id="listAsTemplateCheckbox">
+                        <span>Save as reusable template</span>
+                    </label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="ModalManager.close()">Cancel</button>
+                <button class="btn btn-primary" id="listModalSubmit">Create</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Task Modal -->
+    <div id="taskModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="taskModalTitle">Create Task</h2>
+                <button class="btn-close" onclick="ModalManager.close()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Task Title *</label>
+                    <input type="text" id="taskTitleInput" class="form-input" placeholder="What needs to be done?" autofocus>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Description (optional)</label>
+                    <textarea id="taskDescriptionInput" class="form-textarea" placeholder="Add details..."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Color</label>
+                    <select id="taskColorSelect" class="form-input">
+                        <option value="blue">Blue</option>
+                        <option value="green">Green</option>
+                        <option value="yellow">Yellow</option>
+                        <option value="red">Red</option>
+                        <option value="purple">Purple</option>
+                        <option value="pink">Pink</option>
+                        <option value="cyan">Cyan</option>
+                        <option value="gray">Gray</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-checkbox">
+                        <input type="checkbox" id="taskImportantCheckbox">
+                        <span>Mark as Important <i class="fas fa-fire" style="color: #ef4444; margin-left: 5px;"></i></span>
+                    </label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="ModalManager.close()">Cancel</button>
+                <button class="btn btn-primary" onclick="TaskManager.save()">
+                    <i class="fas fa-save"></i> Save Task
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Templates Modal -->
+    <div id="templatesModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-clone"></i> List Templates</h2>
+                <button class="btn-close" onclick="ModalManager.close()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <div id="templatesList" style="max-height: 400px; overflow-y: auto; padding-right: 10px;">
+                    <!-- Templates will be listed here -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="ModalManager.close()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JSON Tools Modal -->
+    <div id="jsonModal" class="modal">
+        <div class="modal-content" style="max-width: 700px;">
+            <div class="modal-header">
+                <h2><i class="fas fa-code"></i> JSON Tools</h2>
+                <button class="btn-close" onclick="ModalManager.close()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="json-tools-tabs">
+                    <button class="json-tab-btn active" onclick="JSONManager.showTab('export')">
+                        <i class="fas fa-download"></i> Export
+                    </button>
+                    <button class="json-tab-btn" onclick="JSONManager.showTab('import')">
+                        <i class="fas fa-upload"></i> Import
+                    </button>
+                    <button class="json-tab-btn" onclick="JSONManager.showTab('share')">
+                        <i class="fas fa-share-alt"></i> Share
+                    </button>
+                </div>
+                
+                <!-- Export Tab -->
+                <div id="jsonExportTab" class="json-tab-content active">
+                    <div class="form-group">
+                        <label class="form-label">Your Data (Read-only)</label>
+                        <div class="json-preview" id="jsonPreview">
+                            <!-- Preview will be generated here -->
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Raw JSON Data</label>
+                        <textarea id="jsonOutput" class="form-textarea" readonly rows="10" 
+                                  style="font-family: 'Courier New', monospace; font-size: 12px;"></textarea>
+                    </div>
+                    
+                    <div class="json-actions">
+                        <button class="btn btn-primary" onclick="JSONManager.copyData()">
+                            <i class="fas fa-copy"></i> Copy to Clipboard
+                        </button>
+                        <button class="btn btn-success" onclick="JSONManager.downloadJSON()">
+                            <i class="fas fa-file-download"></i> Download JSON File
+                        </button>
+                        <button class="btn btn-secondary" onclick="JSONManager.refreshExport()">
+                            <i class="fas fa-sync-alt"></i> Refresh Preview
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Import Tab -->
+                <div id="jsonImportTab" class="json-tab-content">
+                    <div class="form-group">
+                        <label class="form-label">Paste JSON Data</label>
+                        <textarea id="jsonInput" class="form-textarea" 
+                                  placeholder='Paste your JSON data here...' 
+                                  rows="8"
+                                  style="font-family: 'Courier New', monospace; font-size: 12px;"></textarea>
+                    </div>
+                    
+                    <div id="jsonStatus" class="json-status"></div>
+                    
+                    <div class="json-actions">
+                        <button class="btn btn-secondary" onclick="JSONManager.validateJSON()">
+                            <i class="fas fa-check"></i> Validate JSON
+                        </button>
+                        <button class="btn btn-primary" onclick="JSONManager.importData()">
+                            <i class="fas fa-file-import"></i> Import Data
+                        </button>
+                        <button class="btn btn-outline" onclick="JSONManager.clearJSON()">
+                            <i class="fas fa-eraser"></i> Clear
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Share Tab -->
+                <div id="jsonShareTab" class="json-tab-content">
+                    <div class="share-section">
+                        <h3 style="margin-bottom: 15px; color: #334155;">
+                            <i class="fas fa-share-alt"></i> Share Your Setup
+                        </h3>
+                        
+                        <p style="color: #64748b; margin-bottom: 15px; font-size: 14px;">
+                            Generate a shareable link containing all your boards, lists, and templates.
+                        </p>
+                        
+                        <div class="share-link-input">
+                            <input type="text" id="shareLink" readonly 
+                                   placeholder="Click 'Generate Link' to create a shareable URL">
+                            <button class="btn btn-secondary" onclick="JSONManager.generateShareLink()">
+                                <i class="fas fa-link"></i> Generate Link
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="ModalManager.close()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Modal -->
+    <div id="statsModal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2><i class="fas fa-chart-bar"></i> Statistics</h2>
+                <button class="btn-close" onclick="ModalManager.close()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body" id="statsModalBody">
+                <!-- Stats will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Advanced Clear Modal -->
+    <div id="advancedClearModal" class="modal">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h2><i class="fas fa-trash-alt"></i> Clear Options</h2>
+                <button class="btn-close" onclick="ModalManager.close()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body" id="advancedClearModalBody">
+                <!-- Options will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Clear All Warning Modal -->
+    <div id="clearAllModal" class="modal">
+        <div class="modal-content" style="max-width: 450px;">
+            <div class="modal-header">
+                <h2><i class="fas fa-exclamation-triangle"></i> Clear All Tasks</h2>
+                <button class="btn-close" onclick="ModalManager.close()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body" id="clearAllModalBody">
+                <!-- Warning content will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Time Tracker · UI Notifications</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>📅 Time Tracker · UI Notifications</h1>
+  
+  <div class="toolbar">
+    <button id="addTimerBtn" class="add-btn">+ Add New Timer</button>
+    <button id="importJsonBtn" class="json-btn">Import JSON</button>
+    <button id="exportJsonBtn" class="json-btn">Export JSON</button>
+  </div>
+  
+  <div class="container" id="timers"></div>
+
+  <!-- Custom UI Notification (replaces all alerts/confirms) -->
+  <div id="uiNotification" class="ui-notification" style="display: none;">
+    <span class="ui-notification-icon" id="notifIcon">🔔</span>
+    <span class="ui-notification-message" id="notifMessage">Message</span>
+    <span class="notification-actions" id="notifActions"></span>
+  </div>
+
+  <!-- Add/Edit Timer Modal -->
+  <div id="addTimerModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2 id="modalTitle">Add New Timer</h2>
+      <form id="timerForm">
+        <div class="form-group">
+          <label for="eventName">Event Name:</label>
+          <input type="text" id="eventName" required>
+        </div>
+        <div class="form-group">
+          <label for="eventDate">Date:</label>
+          <input type="date" id="eventDate" required>
+        </div>
+        <div class="form-group">
+          <label for="eventTime">Time:</label>
+          <input type="time" id="eventTime" required>
+        </div>
+        <div class="form-group">
+          <input type="checkbox" id="isHoliday">
+          <label for="isHoliday" style="display: inline-block;">This is a holiday/vacation</label>
+        </div>
+        <div class="form-group" id="endDateGroup" style="display: none;">
+          <label for="endDate">End Date (for multi-day):</label>
+          <input type="date" id="endDate">
+          <label for="endTime">End Time:</label>
+          <input type="time" id="endTime" value="23:59">
+        </div>
+        <button type="submit" class="submit-btn" id="formSubmitBtn">Add Timer</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- JSON Import/Export Modal -->
+  <div id="jsonModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2 id="jsonModalTitle">Import JSON</h2>
+      <textarea id="jsonData" placeholder='Paste your JSON data here...'></textarea>
+      <button id="confirmJsonBtn" class="submit-btn">Confirm</button>
+    </div>
+  </div>
+
+  <script src="main.js"></script>
+</body>
+</html>

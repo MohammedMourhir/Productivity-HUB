@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Smart Time Distributor</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      padding: 30px;
+      max-width: 520px;
+      margin: auto;
+    }
+    h1 { text-align: center; }
+    .box {
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    .activity {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    input {
+      flex: 1;
+      padding: 8px;
+    }
+    button {
+      margin-top: 15px;
+      padding: 10px;
+      width: 100%;
+      cursor: pointer;
+    }
+    .small {
+      margin-top: 10px;
+      font-size: 14px;
+      color: #555;
+    }
+    .result {
+      margin-top: 20px;
+      background: #eef;
+      padding: 15px;
+      border-radius: 8px;
+    }
+    .remove {
+      background: #ffdddd;
+      border: none;
+      cursor: pointer;
+      padding: 8px;
+    }
+  </style>
+</head>
+<body>
+  <h1>⏱ Smart Time Splitter</h1>
+  <div class="box">
+
+    <label>Total available time (hours)</label>
+    <input id="time" type="number" placeholder="ex: 6" />
+
+    <div id="activities"></div>
+
+    <button onclick="addActivity()">➕ Add activity</button>
+    <button onclick="calculate()">Calculate</button>
+
+    <div class="small">Percentages do NOT need to equal 100%. They will auto-normalize.</div>
+
+    <div id="output" class="result"></div>
+  </div>
+
+  <script>
+    function addActivity(name = '', percent = '') {
+      const div = document.createElement('div');
+      div.className = 'activity';
+      div.innerHTML = `
+        <input placeholder="Activity name" value="${name}">
+        <input type="number" placeholder="%" value="${percent}">
+        <button class="remove" onclick="this.parentElement.remove()">✖</button>
+      `;
+      document.getElementById('activities').appendChild(div);
+    }
+
+    function calculate() {
+      const time = Number(document.getElementById('time').value);
+      const activities = document.querySelectorAll('.activity');
+
+      let totalPercent = 0;
+      activities.forEach(a => {
+        totalPercent += Number(a.children[1].value) || 0;
+      });
+
+      if (time <= 0 || totalPercent <= 0) {
+        document.getElementById('output').innerHTML = '⚠ Enter valid time and percentages';
+        return;
+      }
+
+      let result = '';
+      activities.forEach(a => {
+        const name = a.children[0].value || 'Unnamed';
+        const percent = Number(a.children[1].value) || 0;
+        const normalized = percent / totalPercent;
+        const hours = (time * normalized).toFixed(2);
+        result += `⏳ ${name}: <b>${hours} h</b><br>`;
+      });
+
+      document.getElementById('output').innerHTML = result;
+    }
+
+    // default activities
+    addActivity('Study', 40);
+    addActivity('Video Editing', 30);
+    addActivity('Programming', 30);
+  </script>
+</body>
+</html>

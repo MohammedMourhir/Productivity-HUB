@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkillTracker | Make Progress Visible</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container header-content">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <span>SkillTracker</span>
+            </div>
+            
+            <nav>
+                <ul>
+                    <li><a href="#" class="nav-link active" data-view="dashboard">Dashboard</a></li>
+                    <li><a href="#" class="nav-link" data-view="skills">Skills</a></li>
+                    <li><a href="#" class="nav-link" data-view="timeline">Timeline</a></li>
+                    <li><a href="#" class="nav-link" data-view="reflection">Reflection</a></li>
+                    <li><a href="#" class="nav-link" data-view="settings">Settings</a></li>
+                </ul>
+            </nav>
+            
+            <div class="header-actions">
+                <button class="mode-toggle" id="modeToggle">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container">
+        <!-- Dashboard View -->
+        <div class="view active" id="dashboard">
+            <div class="dashboard-header">
+                <h1>Today's Progress Dashboard</h1>
+                <p>Track your skill growth with time, output, and difficulty metrics. Turn invisible practice into visible progress.</p>
+            </div>
+            
+            <div class="stats-cards">
+                <div class="stat-card">
+                    <h3>Current Streak</h3>
+                    <div class="value" id="currentStreak">0 days</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Total Skills</h3>
+                    <div class="value" id="totalSkills">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Weekly Progress</h3>
+                    <div class="value" id="weeklyProgress">0%</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Total Hours</h3>
+                    <div class="value" id="totalHours">0</div>
+                </div>
+            </div>
+            
+            <div class="focus-skill-card">
+                <h2><i class="fas fa-bullseye"></i> Today's Focus Skill</h2>
+                <div class="skill-selector">
+                    <select id="skillSelector">
+                        <option value="0">Select a skill to focus on today</option>
+                    </select>
+                </div>
+                <div id="skillInfo" style="display: none;">
+                    <p><strong>Started:</strong> <span id="skillStartDate"></span></p>
+                    <p><strong>Why:</strong> <span id="skillWhy"></span></p>
+                </div>
+            </div>
+            
+            <div class="tracker-container">
+                <div class="tracker-box">
+                    <h3><i class="fas fa-clock"></i> Session Hours</h3>
+                    <div class="hours-input-container">
+                        <div class="hours-controls">
+                            <button class="hours-btn" id="decreaseHours">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                            <div class="hours-display">
+                                <input type="number" id="hoursInput" value="0.5" min="0.1" max="24" step="0.1">
+                                <span class="hours-label">hours</span>
+                            </div>
+                            <button class="hours-btn" id="increaseHours">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                        <div class="hours-presets">
+                            <button class="hours-preset" data-hours="0.25">15 min</button>
+                            <button class="hours-preset" data-hours="0.5">30 min</button>
+                            <button class="hours-preset" data-hours="1">1 hour</button>
+                            <button class="hours-preset" data-hours="2">2 hours</button>
+                        </div>
+                    </div>
+                    <p class="text-center hint">Track how many hours you practiced today</p>
+                </div>
+                
+                <div class="tracker-box">
+                    <h3><i class="fas fa-calculator"></i> Output Counter</h3>
+                    <div class="output-controls">
+                        <button class="output-btn" id="decreaseOutput">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                        <div class="output-value" id="outputValue">0</div>
+                        <button class="output-btn" id="increaseOutput">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                    <p class="text-center" style="color: var(--gray); margin-bottom: 20px;">Problems solved, drawings done, etc.</p>
+                    <p class="text-center" style="color: var(--success); font-size: 0.9rem;">Improves skill speed by 35%</p>
+                </div>
+                
+                <div class="tracker-box">
+                    <h3><i class="fas fa-sliders-h"></i> Difficulty Rating</h3>
+                    <p style="margin-bottom: 15px; color: var(--gray);">Rate the difficulty of today's practice session (1-5):</p>
+                    <div class="difficulty-slider-container">
+                        <input type="range" min="1" max="5" value="3" class="difficulty-slider" id="difficultySlider">
+                        <div class="difficulty-labels">
+                            <span>1 (Easy)</span>
+                            <span>2</span>
+                            <span>3 (Optimal)</span>
+                            <span>4</span>
+                            <span>5 (Hard)</span>
+                        </div>
+                    </div>
+                    <p class="text-center hint">Keeps practice in optimal learning zone</p>
+                    
+                    <div class="progress-container">
+                        <div class="progress-header">
+                            <span>Weekly Progress</span>
+                            <span id="weeklyProgressValue">0%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="weeklyProgressBar" style="width: 0%;"></div>
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-primary complete-session-btn" id="completeSession">
+                        <i class="fas fa-check-circle"></i> Complete Session
+                    </button>
+                </div>
+            </div>
+            
+            <div class="recent-sessions">
+                <h2><i class="fas fa-history"></i> Recent Sessions</h2>
+                <div id="recentSessionsList">
+                    <p class="empty-state">No sessions recorded yet. Complete your first session!</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Skills View -->
+        <div class="view" id="skills">
+            <div class="skills-header">
+                <h1 style="color: var(--primary);">My Skills</h1>
+                <button class="btn btn-primary" id="openAddSkillModal">
+                    <i class="fas fa-plus"></i> Add New Skill
+                </button>
+            </div>
+            
+            <div class="skills-grid" id="skillsGrid">
+                <!-- Skills will be dynamically added here -->
+                <div class="empty-state-card">
+                    <i class="fas fa-plus-circle" style="font-size: 3rem; color: var(--gray); margin-bottom: 20px;"></i>
+                    <h3>No Skills Yet</h3>
+                    <p>Add your first skill to start tracking progress!</p>
+                    <button class="btn btn-primary" id="addFirstSkill">
+                        <i class="fas fa-plus"></i> Add Your First Skill
+                    </button>
+                </div>
+            </div>
+            
+            <button class="add-skill-btn" id="floatingAddSkillBtn">
+                <i class="fas fa-plus"></i>
+            </button>
+        </div>
+        
+        <!-- Timeline View -->
+        <div class="view" id="timeline">
+            <h1 style="color: var(--primary); margin-bottom: 30px;">Progress Timeline</h1>
+            <div class="timeline-container">
+                <div class="timeline" id="timelineContent">
+                    <div class="empty-state-card">
+                        <i class="fas fa-chart-line" style="font-size: 3rem; color: var(--gray); margin-bottom: 20px;"></i>
+                        <h3>Your Timeline is Empty</h3>
+                        <p>Start tracking skills to see your progress timeline here.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Reflection View -->
+        <div class="view" id="reflection">
+            <h1 style="color: var(--primary); margin-bottom: 30px;">Weekly Reflection</h1>
+            <div class="reflection-card">
+                <p class="hint">Reflection improves learning efficiency by 20-30%</p>
+                
+                <div class="form-group">
+                    <label for="reflectionImproved">What improved this week?</label>
+                    <textarea class="form-control" id="reflectionImproved" rows="4" placeholder="Describe what skills or techniques you've improved..."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="reflectionHard">What was challenging?</label>
+                    <textarea class="form-control" id="reflectionHard" rows="4" placeholder="Describe what you found difficult or challenging..."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="reflectionAdjust">What will you adjust for next week?</label>
+                    <textarea class="form-control" id="reflectionAdjust" rows="4" placeholder="Describe what changes you'll make to your practice routine..."></textarea>
+                </div>
+                
+                <div class="reflection-actions">
+                    <button class="btn btn-primary" id="saveReflection">
+                        <i class="fas fa-save"></i> Save Reflection
+                    </button>
+                    <button class="btn btn-secondary" id="clearReflection">
+                        <i class="fas fa-trash"></i> Clear
+                    </button>
+                </div>
+                
+                <div class="past-reflections" id="pastReflections">
+                    <h3>Past Reflections</h3>
+                    <div id="reflectionsList">
+                        <!-- Past reflections will be displayed here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Settings View -->
+        <div class="view" id="settings">
+            <h1 style="color: var(--primary); margin-bottom: 30px;">Settings</h1>
+            <div class="settings-card">
+                <div class="settings-section">
+                    <h3><i class="fas fa-palette"></i> Appearance</h3>
+                    <div class="form-group">
+                        <label>Theme</label>
+                        <div class="theme-buttons">
+                            <button class="btn btn-secondary" id="lightThemeBtn">
+                                <i class="fas fa-sun"></i> Light Mode
+                            </button>
+                            <button class="btn btn-secondary" id="darkThemeBtn">
+                                <i class="fas fa-moon"></i> Dark Mode
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="settings-section">
+                    <h3><i class="fas fa-database"></i> Data Management</h3>
+                    <div class="form-group">
+                        <label for="exportData">Export All Data</label>
+                        <p class="hint">Export all your skill data as a JSON file for backup or analysis.</p>
+                        <button class="btn btn-secondary" id="exportDataBtn">
+                            <i class="fas fa-download"></i> Export JSON
+                        </button>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="importData">Import Data</label>
+                        <p class="hint">Import skill data from a previously exported JSON file.</p>
+                        <div class="import-container">
+                            <input type="file" id="importFileInput" accept=".json" style="display: none;">
+                            <button class="btn btn-secondary" id="importDataBtn">
+                                <i class="fas fa-upload"></i> Import JSON
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Reset Data</label>
+                        <p class="hint warning">Warning: This will delete all your skill data and cannot be undone.</p>
+                        <button class="btn btn-danger" id="resetDataBtn">
+                            <i class="fas fa-trash"></i> Reset All Data
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="settings-section">
+                    <h3><i class="fas fa-info-circle"></i> About</h3>
+                    <div class="about-info">
+                        <p><strong>SkillTracker v1.0</strong></p>
+                        <p>A minimal website that tracks skill growth using time, output, and difficulty, turning invisible practice into visible progress.</p>
+                        <p class="hint">70% of learners quit because they don't "feel" progress. This website makes progress visible, measurable, and motivating.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Add Skill Modal -->
+    <div class="modal" id="addSkillModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add New Skill</h2>
+                <button class="close-modal" id="closeAddSkillModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="form-group">
+                <label for="newSkillName">Skill Name</label>
+                <input type="text" class="form-control" id="newSkillName" placeholder="e.g., JavaScript, Piano, Digital Art">
+            </div>
+            
+            <div class="form-group">
+                <label for="newSkillWhy">Why are you learning this? (1 sentence)</label>
+                <textarea class="form-control" id="newSkillWhy" rows="3" placeholder="e.g., To build my own SaaS product, to create digital art for my games, to communicate with Spanish-speaking clients"></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="newSkillGoal">Main Goal (Optional)</label>
+                <input type="text" class="form-control" id="newSkillGoal" placeholder="e.g., Draw a full anime character from imagination">
+            </div>
+            
+            <div class="form-group">
+                <label for="newSkillHours">Estimated Hours Needed (Optional)</label>
+                <input type="number" class="form-control" id="newSkillHours" placeholder="e.g., 100" min="1">
+            </div>
+            
+            <button class="btn btn-primary" id="saveNewSkill" style="width: 100%; padding: 15px;">
+                <i class="fas fa-plus"></i> Add Skill
+            </button>
+        </div>
+    </div>
+
+    <!-- Session Details Modal -->
+    <div class="modal" id="sessionDetailsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Session Details</h2>
+                <button class="close-modal" id="closeSessionModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="sessionDetailsContent">
+                <!-- Session details will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div class="modal" id="confirmationModal">
+        <div class="modal-content confirmation-content">
+            <div class="modal-header">
+                <h2 id="confirmationTitle">Confirm Action</h2>
+                <button class="close-modal" id="closeConfirmationModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="confirmation-body">
+                <div class="confirmation-icon" id="confirmationIcon">
+                    <i class="fas fa-exclamation-triangle" style="color: var(--warning); font-size: 3rem;"></i>
+                </div>
+                <p id="confirmationMessage">Are you sure you want to proceed?</p>
+                <div class="confirmation-actions">
+                    <button class="btn btn-secondary" id="cancelConfirmation">Cancel</button>
+                    <button class="btn btn-primary" id="confirmAction">Confirm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success/Info Modal -->
+    <div class="modal" id="infoModal">
+        <div class="modal-content info-content">
+            <div class="modal-header">
+                <h2 id="infoTitle">Notification</h2>
+                <button class="close-modal" id="closeInfoModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="info-body">
+                <div class="info-icon" id="infoIcon">
+                    <i class="fas fa-check-circle" style="color: var(--success); font-size: 3rem;"></i>
+                </div>
+                <p id="infoMessage">This is a notification message.</p>
+                <button class="btn btn-primary" id="closeInfoBtn">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
